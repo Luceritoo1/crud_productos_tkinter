@@ -1,1 +1,8 @@
-[]
+[
+    {
+        "id_producto": 1,
+        "nombre": "dksandk",
+        "precio": 22.0,
+        "cantidad": 22
+    }
+]

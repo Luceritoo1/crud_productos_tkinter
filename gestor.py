@@ -1,6 +1,7 @@
 import json
 import os
 from modelo import Producto
+from utils import registrar_info, registrar_error
 
 
 class GestorProductos:
@@ -24,6 +25,7 @@ class GestorProductos:
                 datos = json.load(f)
                 return [Producto.from_dict(p) for p in datos]
             except json.JSONDecodeError:
+                registrar_error("Error al leer el archivo JSON.")
                 return []
 
     def guardar_datos(self):
@@ -53,6 +55,7 @@ class GestorProductos:
         )
         self.productos.append(nuevo_producto)
         self.guardar_datos()
+        registrar_info(f"Producto agregado: {nombre}")
         return nuevo_producto
 
     def listar_productos(self):
@@ -80,7 +83,10 @@ class GestorProductos:
             producto.precio = precio
             producto.cantidad = cantidad
             self.guardar_datos()
+            registrar_info(f"Producto actualizado: {id_producto}")
             return True
+
+        registrar_error(f"No se pudo actualizar producto: {id_producto}")
         return False
 
     def eliminar_producto(self, id_producto):
@@ -91,5 +97,8 @@ class GestorProductos:
         if producto:
             self.productos.remove(producto)
             self.guardar_datos()
+            registrar_info(f"Producto eliminado: {id_producto}")
             return True
+
+        registrar_error(f"No se pudo eliminar producto: {id_producto}")
         return False
