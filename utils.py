@@ -1,6 +1,11 @@
 import logging
 
 
+class ProductoError(Exception):
+    """Excepción personalizada para errores de producto."""
+    pass
+
+
 def configurar_logging():
     logging.basicConfig(
         filename="sistema.log",

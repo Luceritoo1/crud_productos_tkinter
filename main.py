@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from gestor import GestorProductos
 from utils import configurar_logging
+from utils import ProductoError
 
 
 class AplicacionCRUD:
@@ -107,6 +108,8 @@ class AplicacionCRUD:
             self.limpiar_campos()
             messagebox.showinfo("Éxito", "Producto agregado correctamente.")
 
+        except ProductoError as e:
+            messagebox.showerror("Error", str(e))
         except ValueError:
             messagebox.showerror("Error", "Precio debe ser número y cantidad entero.")
 
@@ -141,8 +144,10 @@ class AplicacionCRUD:
             else:
                 messagebox.showerror("Error", "No se pudo actualizar.")
 
+        except ProductoError as e:
+            messagebox.showerror("Error", str(e))
         except ValueError:
-            messagebox.showerror("Error", "Datos inválidos.")
+            messagebox.showerror("Error", "Precio debe ser número y cantidad entero.")
 
     def eliminar_producto(self):
         seleccionado = self.tabla.selection()
