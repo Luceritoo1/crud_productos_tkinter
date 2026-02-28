@@ -9,7 +9,7 @@ class AplicacionCRUD:
     def __init__(self, root):
         self.root = root
         self.root.title("Sistema de Gestión de Productos")
-        self.root.geometry("700x500")
+        self.root.geometry("800x550")
 
         self.gestor = GestorProductos()
 
@@ -17,6 +17,16 @@ class AplicacionCRUD:
         self.cargar_tabla()
 
     def crear_widgets(self):
+
+        # ===== BUSCADOR =====
+        frame_busqueda = tk.Frame(self.root)
+        frame_busqueda.pack(pady=5)
+
+        tk.Label(frame_busqueda, text="Buscar:").pack(side=tk.LEFT)
+        self.entry_buscar = tk.Entry(frame_busqueda)
+        self.entry_buscar.pack(side=tk.LEFT)
+        self.entry_buscar.bind("<KeyRelease>", self.buscar_producto)
+
         # ===== FRAME FORMULARIO =====
         frame_form = tk.Frame(self.root)
         frame_form.pack(pady=10)
@@ -51,11 +61,17 @@ class AplicacionCRUD:
 
         self.tabla.bind("<<TreeviewSelect>>", self.seleccionar_producto)
 
+        # ===== CONTADOR =====
+        self.label_contador = tk.Label(self.root, text="")
+        self.label_contador.pack()
+
     def cargar_tabla(self):
         for fila in self.tabla.get_children():
             self.tabla.delete(fila)
 
-        for producto in self.gestor.listar_productos():
+        productos = self.gestor.listar_productos()
+
+        for producto in productos:
             self.tabla.insert("", "end", values=(
                 producto.id_producto,
                 producto.nombre,
@@ -63,11 +79,24 @@ class AplicacionCRUD:
                 producto.cantidad
             ))
 
+        self.label_contador.config(text=f"Total de productos: {len(productos)}")
+
     def agregar_producto(self):
         try:
-            nombre = self.entry_nombre.get()
-            precio = float(self.entry_precio.get())
-            cantidad = int(self.entry_cantidad.get())
+            nombre = self.entry_nombre.get().strip()
+            precio_texto = self.entry_precio.get().strip()
+            cantidad_texto = self.entry_cantidad.get().strip()
+
+            if not nombre:
+                messagebox.showerror("Error", "El nombre no puede estar vacío.")
+                return
+
+            if not precio_texto or not cantidad_texto:
+                messagebox.showerror("Error", "Precio y cantidad son obligatorios.")
+                return
+
+            precio = float(precio_texto)
+            cantidad = int(cantidad_texto)
 
             if precio < 0 or cantidad < 0:
                 messagebox.showerror("Error", "Precio y cantidad no pueden ser negativos.")
@@ -79,7 +108,7 @@ class AplicacionCRUD:
             messagebox.showinfo("Éxito", "Producto agregado correctamente.")
 
         except ValueError:
-            messagebox.showerror("Error", "Datos inválidos.")
+            messagebox.showerror("Error", "Precio debe ser número y cantidad entero.")
 
     def actualizar_producto(self):
         try:
@@ -89,9 +118,21 @@ class AplicacionCRUD:
                 return
 
             id_producto = int(self.tabla.item(seleccionado)["values"][0])
-            nombre = self.entry_nombre.get()
-            precio = float(self.entry_precio.get())
-            cantidad = int(self.entry_cantidad.get())
+
+            nombre = self.entry_nombre.get().strip()
+            precio_texto = self.entry_precio.get().strip()
+            cantidad_texto = self.entry_cantidad.get().strip()
+
+            if not nombre:
+                messagebox.showerror("Error", "El nombre no puede estar vacío.")
+                return
+
+            precio = float(precio_texto)
+            cantidad = int(cantidad_texto)
+
+            if precio < 0 or cantidad < 0:
+                messagebox.showerror("Error", "Precio y cantidad no pueden ser negativos.")
+                return
 
             if self.gestor.actualizar_producto(id_producto, nombre, precio, cantidad):
                 self.cargar_tabla()
@@ -118,6 +159,21 @@ class AplicacionCRUD:
             self.limpiar_campos()
             messagebox.showinfo("Éxito", "Producto eliminado.")
 
+    def buscar_producto(self, event):
+        texto = self.entry_buscar.get().lower()
+
+        for fila in self.tabla.get_children():
+            self.tabla.delete(fila)
+
+        for producto in self.gestor.listar_productos():
+            if texto in producto.nombre.lower():
+                self.tabla.insert("", "end", values=(
+                    producto.id_producto,
+                    producto.nombre,
+                    producto.precio,
+                    producto.cantidad
+                ))
+
     def seleccionar_producto(self, event):
         seleccionado = self.tabla.selection()
         if seleccionado:
@@ -135,8 +191,6 @@ class AplicacionCRUD:
         self.entry_cantidad.delete(0, tk.END)
 
 
-
-    
 if __name__ == "__main__":
     configurar_logging()
     root = tk.Tk()
