@@ -1,5 +1,8 @@
 __pycache__/
 *.pyc
-.env
-venv/
+data.json
+test_data.json
+dist/
+build/
+*.spec
 sistema.log

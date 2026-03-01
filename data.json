@@ -4,5 +4,11 @@
         "nombre": "dksandk",
         "precio": 22.0,
         "cantidad": 22
+    },
+    {
+        "id_producto": 2,
+        "nombre": "noo",
+        "precio": 34.0,
+        "cantidad": 34
     }
 ]
